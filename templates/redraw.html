@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>redraw</title>
+    <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.1.6.js"></script>
+  </head>
+  <body>
+
+      <div id="chartContainer">
+        <script type="text/javascript">
+        var chart ;
+        var source = new EventSource('/stream');
+        source.onmessage = function (event) {
+          var chartData = eval(event.data);
+          $("#content").html( chartData ) ;
+
+          if(chartData != 1){
+            if( typeof( chart )  == 'undefined' ){
+              drawBarChart(chartData);
+            }else{
+              chart.data = chartData ;
+              chart.draw(1000) ;
+            }
+          }
+        };
+
+        function drawBarChart(chartData){
+          var svg = dimple.newSvg("#chartContainer", 1000, 600);
+          chart = new dimple.chart(svg, chartData);
+          chart.setBounds(60, 30, 510, 330)
+          chart.addCategoryAxis("x", "word");
+          chart.addMeasureAxis("y", "amount");
+          chart.addSeries("Name Count", dimple.plot.bar);
+          chart.addLegend(65, 10, 510, 20, "right");
+          chart.draw(1000);
+        };
+        </script>
+
+      </div>
+      <div id="content"></div>
+  </body>
+</html>
